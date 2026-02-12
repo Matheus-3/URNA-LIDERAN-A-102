@@ -1,0 +1,595 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Urna Eletrônica - Liderança</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap');
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #e5e7eb;
+            user-select: none;
+        }
+
+        .urna-body {
+            background-color: #d1d5db;
+            border: 4px solid #9ca3af;
+            box-shadow: 10px 10px 25px rgba(0,0,0,0.2), inset 2px 2px 5px white;
+        }
+
+        .urna-screen {
+            background-color: #f3f4f6;
+            border: 4px solid #a1a1aa;
+            box-shadow: inset 2px 2px 10px rgba(0,0,0,0.1);
+            min-height: 380px;
+            
+        }
+
+        .keypad-button {
+            background-color: #18181b;
+            color: white;
+            box-shadow: 3px 3px 0px #000;
+            transition: all 0.1s;
+        }
+
+        .keypad-button:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0px #000;
+        }
+
+        .btn-branco { background-color: #ffffff; color: black; font-size: 10px; }
+        .btn-corrige { background-color: #f97316; color: black; font-size: 10px; }
+        .btn-confirma { background-color: #059669; color: black; font-size: 10px; height: 65px !important; margin-top: -10px; }
+
+        .fim-text {
+            font-size: 120px;
+            font-weight: 900;
+            color: #374151;
+            letter-spacing: -5px;
+        }
+
+        .candidate-photo-frame {
+            border: 2px solid black;
+            background: white;
+            width: 250px;
+            height: 310px;
+            position: fixed;
+            top: 150px;
+            right: 665px;
+        }
+
+        .pulse-cursor {
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .class-badge {
+            background: #374151;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 15px;
+            font-weight: bold;
+            position: fixed;
+            top: 502px;
+            right: 665px;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-4">
+
+    <!-- Seleção Inicial de Turma -->
+    <div id="class-selection-overlay" class="fixed inset-0 bg-zinc-900/90 z-[60] flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-8 max-w-2xl w-full shadow-2xl">
+            <h2 class="text-2xl font-black mb-6 border-b pb-4">Selecione a Turma para Votação</h2>
+            <div id="class-grid" class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <!-- Gerado por JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Container da Urna -->
+    <div class="urna-body rounded-xl p-8 flex flex-col lg:flex-row gap-8 max-w-5xl w-full relative">
+        
+        <!-- Tela (Esquerda) -->
+        <div id="screen-container" class="urna-screen flex-1 p-4 flex flex-col overflow-hidden">
+            <div id="screen-content" class="h-full flex flex-col">
+                <div class="flex-1">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-sm font-bold uppercase mb-1">Seu voto para</p>
+                            <h2 class="text-2xl font-black mb-2">LIDERANÇA</h2>
+                        </div>
+                        <div id="active-class-display" class="class-badge">TURMA: ---</div>
+                    </div>
+                    
+                    <div id="number-boxes" class="flex gap-2 mb-6 mt-4">
+                        <div class="w-10 h-14 border-2 border-black flex items-center justify-center text-3xl font-bold bg-white" id="box-0"></div>
+                        <div class="w-10 h-14 border-2 border-black flex items-center justify-center text-3xl font-bold bg-white" id="box-1"></div>
+                    </div>
+
+                    <div id="candidate-info" class="hidden space-y-2">
+                        <p class="text-sm uppercase"><span class="font-bold">Candidato(a):</span> <span id="info-name">---</span></p>
+                        <p class="text-sm uppercase"><span class="font-bold">Turma:</span> <span id="info-party">---</span></p>
+                    </div>
+
+                    <div id="null-msg" class="hidden mt-4">
+                        <h3 class="text-3xl font-black animate-pulse">NÚMERO ERRADO</h3>
+                        <p class="text-xl font-bold">VOTO NULO</p>
+                    </div>
+                </div>
+
+                <div id="screen-footer" class="border-t-2 border-black pt-2 text-[10px] leading-tight mt-4">
+                    <p>APERTE A TECLA:</p>
+                    <p>CONFIRMA PARA CONFIRMAR ESTE VOTO</p>
+                    <p>CORRIGE PARA REINICIAR ESTE VOTO</p>
+                </div>
+            </div>
+
+            <!-- Área da Foto -->
+            <div id="photo-container" class="hidden absolute top-4 right-4 flex flex-col items-center">
+                <div class="candidate-photo-frame overflow-hidden">
+                    <img id="candidate-img" src="" alt="" class="w-full h-full object-cover">
+                </div>
+            </div>
+        </div>
+
+        <!-- Teclado (Direita) -->
+        <div class="w-full lg:w-80 flex flex-col">
+            <div class="flex justify-between items-center mb-6 px-2">
+                <div class="flex flex-col">
+                    <span class="text-zinc-600 text-xs font-bold tracking-widest uppercase">Liderança</span>
+                    <span class="text-zinc-700 text-xl font-black tracking-tighter">2026</span>
+                </div>
+                <img src="./ChatGPT Image 8 de fev. de 2026, 19_31_41.png" class="w-10 opacity-90" alt="Brasão">
+            </div>
+
+            <div class="bg-zinc-800 p-6 rounded-sm shadow-2xl">
+                <div class="grid grid-cols-3 gap-3 mb-6">
+                    <button onclick="pressNumber('1')" class="keypad-button h-12 text-2xl font-bold rounded">1</button>
+                    <button onclick="pressNumber('2')" class="keypad-button h-12 text-2xl font-bold rounded">2</button>
+                    <button onclick="pressNumber('3')" class="keypad-button h-12 text-2xl font-bold rounded">3</button>
+                    <button onclick="pressNumber('4')" class="keypad-button h-12 text-2xl font-bold rounded">4</button>
+                    <button onclick="pressNumber('5')" class="keypad-button h-12 text-2xl font-bold rounded">5</button>
+                    <button onclick="pressNumber('6')" class="keypad-button h-12 text-2xl font-bold rounded">6</button>
+                    <button onclick="pressNumber('7')" class="keypad-button h-12 text-2xl font-bold rounded">7</button>
+                    <button onclick="pressNumber('8')" class="keypad-button h-12 text-2xl font-bold rounded">8</button>
+                    <button onclick="pressNumber('9')" class="keypad-button h-12 text-2xl font-bold rounded">9</button>
+                    <button onclick="pressNumber('0')" class="keypad-button h-12 text-2xl font-bold rounded col-start-2">0</button>
+                </div>
+
+                <div class="grid grid-cols-3 gap-2">
+                    <button onclick="pressBranco()" class="btn-branco h-12 font-bold rounded flex items-end justify-center pb-1 uppercase">Branco</button>
+                    <button onclick="pressCorrige()" class="btn-corrige h-12 font-bold rounded flex items-end justify-center pb-1 uppercase">Corrige</button>
+                    <button onclick="pressConfirma()" class="btn-confirma h-14 font-bold rounded flex items-end justify-center pb-1 uppercase">Confirma</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botoes Admin -->
+    <div class="mt-8 flex gap-4">
+        <button onclick="showResults()" class="bg-zinc-800 text-white px-6 py-2 rounded-full font-bold text-xs uppercase shadow-lg hover:bg-black transition-all">Ver Resultados</button>
+        <button onclick="openClassSelection()" class="bg-zinc-100 text-zinc-600 border border-zinc-300 px-6 py-2 rounded-full font-bold text-xs uppercase shadow-sm hover:bg-white transition-all">Trocar Turma</button>
+    </div>
+
+    <!-- Modal Resultados -->
+    <div id="results-modal" class="fixed inset-0 bg-black/80 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl p-8 max-w-3xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6 border-b pb-4">
+                <h2 class="text-2xl font-black">Resultados</h2>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold uppercase text-zinc-400">Filtrar:</span>
+                    <select id="result-class-filter" onchange="renderResultsTable()" class="bg-zinc-100 px-3 py-1 rounded font-bold text-sm">
+                        <!-- Gerado por JS -->
+                    </select>
+                    <button onclick="closeResults()" class="ml-4 text-zinc-400 hover:text-black">✕</button>
+                </div>
+            </div>
+
+            <div id="podium" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8"></div>
+
+            <table class="w-full text-left">
+                <thead class="bg-zinc-50">
+                    <tr>
+                        <th class="p-3 text-[10px] uppercase font-black">Nº</th>
+                        <th class="p-3 text-[10px] uppercase font-black">Candidato</th>
+                        <th class="p-3 text-right text-[10px] uppercase font-black">Votos</th>
+                    </tr>
+                </thead>
+                <tbody id="results-table-body"></tbody>
+            </table>
+
+            <div class="mt-8 flex justify-between items-center">
+                <button onclick="clearVotes()" class="text-red-500 font-bold text-[10px] uppercase hover:underline">Zerar Tudo</button>
+                <button onclick="closeResults()" class="bg-zinc-900 text-white px-6 py-2 rounded-lg font-bold">FECHAR</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DADOS ---
+        const CLASSES = ['101', '102', '103', '104', '201', '202', '203', '204', '301', '302', '303', '304'];
+        
+        const CANDIDATES = [
+            //Turma 101
+            { number: '10', name: 'LORA', party: '101', photo: 'https://picsum.photos/seed/10/200/250' },
+            { number: '11', name: 'LIVIA', party: '101', photo: 'https://picsum.photos/seed/10/200/250' },
+            { number: '12', name: 'LUIS', party: '101', photo: 'https://picsum.photos/seed/10/200/250' },
+            { number: '13', name: 'LUIS', party: '101', photo: 'https://picsum.photos/seed/10/200/250' },
+            // Turma 102
+            { number: '14', name: 'MATHEUS SILVA', party: '301', photo: 'https://picsum.photos/seed/10/200/250' },
+            { number: '15', name: 'EDUARDO', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '16', name: 'EDUARDO amorim', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '17', name: 'EDUARDO CORREAI', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
+            // Turma 103
+            { number: '14', name: 'MATHEUS SILVA', party: '301', photo: 'https://picsum.photos/seed/10/200/250' },
+            { number: '15', name: 'EDUARDO', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '16', name: 'EDUARDO amorim', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '17', name: 'EDUARDO CORREAI', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
+            // Turma 104
+            { number: '14', name: 'MATHEUS SILVA', party: '301', photo: 'https://picsum.photos/seed/10/200/250' },
+            { number: '15', name: 'EDUARDO', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '16', name: 'EDUARDO amorim', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '17', name: 'EDUARDO CORREAI', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
+            // Turma 201
+            { number: '14', name: 'MATHEUS SILVA', party: '301', photo: 'https://picsum.photos/seed/10/200/250' },
+            { number: '15', name: 'EDUARDO', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '16', name: 'EDUARDO amorim', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '17', name: 'EDUARDO CORREAI', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
+            // Turma 202
+            { number: '14', name: 'MATHEUS SILVA', party: '301', photo: 'https://picsum.photos/seed/10/200/250' },
+            { number: '15', name: 'EDUARDO', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '16', name: 'EDUARDO amorim', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '17', name: 'EDUARDO CORREAI', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
+            // Turma 203
+            { number: '14', name: 'MATHEUS SILVA', party: '301', photo: 'https://picsum.photos/seed/10/200/250' },
+            { number: '15', name: 'EDUARDO', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '16', name: 'EDUARDO amorim', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '17', name: 'EDUARDO CORREAI', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
+            // Turma 204
+            { number: '14', name: 'MATHEUS SILVA', party: '301', photo: 'https://picsum.photos/seed/10/200/250' },
+            { number: '15', name: 'EDUARDO', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '16', name: 'EDUARDO amorim', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '17', name: 'EDUARDO CORREAI', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
+            // Turma 301
+            { number: '14', name: 'MATHEUS SILVA', party: '301', photo: 'https://picsum.photos/seed/10/200/250' },
+            { number: '15', name: 'EDUARDO', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '16', name: 'EDUARDO amorim', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '17', name: 'EDUARDO CORREAI', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
+            // Turma 302
+            { number: '14', name: 'MATHEUS SILVA', party: '301', photo: 'https://picsum.photos/seed/10/200/250' },
+            { number: '15', name: 'EDUARDO', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '16', name: 'EDUARDO amorim', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '17', name: 'EDUARDO CORREAI', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
+            // Turma 303
+            { number: '14', name: 'MATHEUS SILVA', party: '301', photo: 'https://picsum.photos/seed/10/200/250' },
+            { number: '15', name: 'EDUARDO', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '16', name: 'EDUARDO amorim', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '17', name: 'EDUARDO CORREAI', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
+            // Turma 304
+            { number: '14', name: 'MATHEUS SILVA', party: '301', photo: 'https://picsum.photos/seed/10/200/250' },
+            { number: '15', name: 'EDUARDO', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '16', name: 'EDUARDO amorim', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '17', name: 'EDUARDO CORREAI', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
+            // Genéricos para demonstração (se não encontrar na lista acima)
+            { number: '14', name: 'MATHEUS SILVA', party: '301', photo: 'https://picsum.photos/seed/10/200/250' },
+            { number: '15', name: 'EDUARDO', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '16', name: 'EDUARDO amorim', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '17', name: 'EDUARDO CORREAI', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
+        ];
+
+        // --- ESTADO ---
+        let currentNumber = "";
+        let isConfirmed = false;
+        let isWhite = false;
+        let votes = JSON.parse(localStorage.getItem('urna_votes')) || [];
+
+        // --- INICIALIZAÇÃO ---
+        function initClassGrid() {
+            const grid = document.getElementById('class-grid');
+            const filter = document.getElementById('result-class-filter');
+            
+            grid.innerHTML = CLASSES.map(cls => `
+                <button onclick="selectClass('${cls}')" class="bg-zinc-100 hover:bg-zinc-800 hover:text-white p-4 rounded-xl font-black text-lg transition-all border-2 border-zinc-200">
+                    ${cls}
+                </button>
+            `).join('');
+
+            filter.innerHTML = `<option value="ALL">TODAS AS SALAS</option>` + CLASSES.map(cls => `
+                <option value="${cls}">SALA ${cls}</option>
+            `).join('');
+        }
+
+        function selectClass(cls) {
+            selectedClass = cls;
+            document.getElementById('class-selection-overlay').style.display = 'none';
+            document.getElementById('active-class-display').innerText = `TURMA: ${cls}`;
+            resetUrna();
+        }
+
+        function openClassSelection() {
+            document.getElementById('class-selection-overlay').style.display = 'flex';
+        }
+
+        // --- SISTEMA DE ÁUDIO ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playBeep() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(2300, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.1);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.1);
+        }
+
+        // Modificação AQUI: playConfirm() para incluir o áudio da urna
+        function playConfirm() {
+            // Se você quiser manter os bipes personalizados ANTES do áudio da urna, descomente o bloco abaixo:
+            /*
+            const frequencies = [2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000];
+            const times = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1]; // Ajustei os tempos para tocar mais rápido
+            frequencies.forEach((f, i) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(f, audioCtx.currentTime + times[i]);
+                gain.gain.setValueAtTime(0.05, audioCtx.currentTime + times[i]);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + times[i] + 0.1); // Bipes mais curtos
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(audioCtx.currentTime + times[i]);
+                osc.stop(audioCtx.currentTime + times[i] + 0.1);
+            });
+            */
+
+            // --- NOVO CÓDIGO PARA O ÁUDIO DA URNA ---
+            const urnaAudio = new Audio('./confirma-urna.mp3'); // Caminho para o seu arquivo de áudio
+            urnaAudio.volume = 0.7; // Ajuste o volume se necessário (0.0 a 1.0)
+            urnaAudio.play();
+
+            // Você pode adicionar um pequeno delay antes do "FIM" aparecer se o áudio for longo
+            // No seu código atual, o FIM aparece após o timeout de 3 segundos no pressConfirma()
+        }
+
+        // ... (o restante do seu código JavaScript) ...
+
+            
+
+        // --- LÓGICA DA INTERFACE ---
+        function updateScreen() {
+            const box0 = document.getElementById('box-0');
+            const box1 = document.getElementById('box-1');
+            const info = document.getElementById('candidate-info');
+            const photoCont = document.getElementById('photo-container');
+            const nullMsg = document.getElementById('null-msg');
+            const footer = document.getElementById('screen-footer');
+
+            // Limpa tudo
+            box0.innerText = currentNumber[0] || "";
+            box1.innerText = currentNumber[1] || "";
+            info.classList.add('hidden');
+            photoCont.classList.add('hidden');
+            nullMsg.classList.add('hidden');
+
+            if (isConfirmed) {
+                document.getElementById('screen-content').innerHTML = `
+                    <div class="flex-1 flex items-center justify-center">
+                        <span class="fim-text">FIM</span>
+                    </div>
+                `;
+                return;
+            }
+
+            box0.innerText = currentNumber[0] || "";
+            box1.innerText = currentNumber[1] || "";
+            info.classList.add('hidden');
+            photoCont.classList.add('hidden');
+            nullMsg.classList.add('hidden');
+
+            if (isWhite) {
+                info.classList.add('hidden');
+                nullMsg.classList.add('hidden');
+                document.getElementById('number-boxes').classList.add('hidden');
+                info.insertAdjacentHTML('beforebegin', '<h2 id="white-label" class="text-4xl font-black mt-8">VOTO EM BRANCO</h2>');
+                return;
+            } else {
+                const whiteLabel = document.getElementById('white-label');
+                if (whiteLabel) whiteLabel.remove();
+                document.getElementById('number-boxes').classList.remove('hidden');
+            }
+
+            if (currentNumber.length === 2) {
+                // FILTRO POR TURMA É ESSENCIAL AQUI
+                const cand = CANDIDATES.find(c => c.number === currentNumber && c.party === selectedClass);
+                if (cand) {
+                    info.classList.remove('hidden');
+                    photoCont.classList.remove('hidden');
+                    document.getElementById('info-name').innerText = cand.name;
+                    document.getElementById('info-party').innerText = cand.party;
+                    document.getElementById('candidate-img').src = cand.photo;
+                } else {
+                    nullMsg.classList.remove('hidden');
+                }
+            }
+        }
+
+        function pressNumber(n) {
+            if (currentNumber.length < 2 && !isConfirmed && !isWhite) {
+                playBeep();
+                currentNumber += n;
+                updateScreen();
+            }
+        }
+
+        function pressCorrige() {
+            playBeep();
+            resetUrna();
+        }
+
+        function pressBranco() {
+            if (!isConfirmed) {
+                playBeep();
+                isWhite = true;
+                currentNumber = "";
+                updateScreen();
+            }
+        }
+
+        function pressConfirma() {
+            if (isConfirmed || !selectedClass) return;
+
+            if (isWhite || currentNumber.length === 2) {
+                playConfirm();
+                
+                const cand = CANDIDATES.find(c => c.number === currentNumber && c.party === selectedClass);
+                const voteValue = isWhite ? 'BRANCO' : (cand ? currentNumber : 'NULO');
+                
+                votes.push({
+                    value: voteValue,
+                    classId: selectedClass,
+                    timestamp: Date.now()
+                });
+                
+                localStorage.setItem('urna_votes_multi', JSON.stringify(votes));
+                isConfirmed = true;
+                updateScreen();
+
+                setTimeout(() => { resetUrna(); }, 3000);
+            }
+        }
+
+        function resetUrna() {
+            currentNumber = "";
+            isConfirmed = false;
+            isWhite = false;
+            document.getElementById('screen-container').innerHTML = `
+                <div id="screen-content" class="h-full flex flex-col">
+                    <div class="flex-1">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-sm font-bold uppercase mb-1">Seu voto para</p>
+                                <h2 class="text-2xl font-black mb-2">LIDERANÇA</h2>
+                            </div>
+                            <div id="active-class-display" class="class-badge">TURMA: ${selectedClass}</div>
+                        </div>
+                        <div id="number-boxes" class="flex gap-2 mb-6 mt-4">
+                            <div class="w-10 h-14 border-2 border-black flex items-center justify-center text-3xl font-bold bg-white" id="box-0"></div>
+                            <div class="w-10 h-14 border-2 border-black flex items-center justify-center text-3xl font-bold bg-white" id="box-1"></div>
+                        </div>
+                        <div id="candidate-info" class="hidden space-y-2">
+                            <p class="text-sm uppercase"><span class="font-bold">Candidato(a):</span> <span id="info-name">---</span></p>
+                            <p class="text-sm uppercase"><span class="font-bold">Turma:</span> <span id="info-party">---</span></p>
+                        </div>
+                        <div id="null-msg" class="hidden mt-4">
+                            <h3 class="text-3xl font-black animate-pulse">NÚMERO ERRADO</h3>
+                            <p class="text-xl font-bold">VOTO NULO</p>
+                        </div>
+                    </div>
+                    <div id="screen-footer" class="border-t-2 border-black pt-2 text-[10px] leading-tight mt-4">
+                        <p>APERTE A TECLA:</p>
+                        <p>CONFIRMA PARA CONFIRMAR ESTE VOTO</p>
+                        <p>CORRIGE PARA REINICIAR ESTE VOTO</p>
+                    </div>
+                </div>
+                <div id="photo-container" class="hidden absolute top-4 right-4 flex flex-col items-center">
+                    <div class="candidate-photo-frame overflow-hidden">
+                        <img id="candidate-img" src="" alt="" class="w-full h-full object-cover">
+                    </div>
+                </div>
+            `;
+            updateScreen();
+        }
+
+        // --- RESULTADOS ---
+        function renderResultsTable() {
+            const filter = document.getElementById('result-class-filter').value;
+            const tableBody = document.getElementById('results-table-body');
+            const podium = document.getElementById('podium');
+
+            const filteredVotes = filter === 'ALL' ? votes : votes.filter(v => v.classId === filter);
+            
+            const counts = {};
+            filteredVotes.forEach(v => { counts[v.value] = (counts[v.value] || 0) + 1; });
+
+            const sorted = Object.entries(counts).map(([number, count]) => {
+                const cand = CANDIDATES.find(c => c.number === number && (filter === 'ALL' || c.party === filter));
+                return {
+                    number,
+                    name: cand ? cand.name : (number === 'BRANCO' ? 'BRANCO' : 'NULO'),
+                    count
+                };
+            }).sort((a, b) => b.count - a.count);
+
+            const leader = sorted[0];
+            const vice = sorted[1];
+
+            podium.innerHTML = `
+                <div class="bg-emerald-50 p-6 rounded-xl border-2 border-emerald-200">
+                    <p class="text-emerald-600 font-bold text-[8px] uppercase tracking-widest mb-1">Líder mais votado</p>
+                    <p class="text-xl font-black text-emerald-900">${leader ? leader.name : '---'}</p>
+                    <p class="text-emerald-700 font-bold">${leader ? leader.count : 0} VOTOS</p>
+                </div>
+                <div class="bg-amber-50 p-6 rounded-xl border-2 border-amber-200">
+                    <p class="text-amber-600 font-bold text-[8px] uppercase tracking-widest mb-1">Vice / Segundo</p>
+                    <p class="text-xl font-black text-amber-900">${vice ? vice.name : '---'}</p>
+                    <p class="text-amber-700 font-bold">${vice ? vice.count : 0} VOTOS</p>
+                </div>
+            `;
+
+            tableBody.innerHTML = sorted.map(res => `
+                <tr class="border-b hover:bg-zinc-50">
+                    <td class="p-3 font-bold text-sm">${res.number}</td>
+                    <td class="p-3 text-sm">${res.name}</td>
+                    <td class="p-3 text-right font-black text-zinc-800">${res.count}</td>
+                </tr>
+            `).join('');
+
+            if (sorted.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="3" class="p-10 text-center text-gray-400">Nenhum voto registrado para este filtro.</td></tr>`;
+            }
+        }
+
+        function showResults() {
+            document.getElementById('results-modal').classList.remove('hidden');
+            document.getElementById('results-modal').classList.add('flex');
+            renderResultsTable();
+        }
+
+        function closeResults() {
+            document.getElementById('results-modal').classList.add('hidden');
+        }
+
+        function clearVotes() {
+            if (confirm("Deseja apagar TODOS os votos de TODAS as turmas?")) {
+                votes = [];
+                localStorage.removeItem('urna_votes_multi');
+                renderResultsTable();
+            }
+        }
+
+        // Teclado físico
+        document.addEventListener('keydown', (e) => {
+            if (e.key >= '0' && e.key <= '9') pressNumber(e.key);
+            if (e.key === 'Enter') pressConfirma();
+            if (e.key === 'Backspace') pressCorrige();
+            if (e.key === ' ' || e.key === 'Shift') pressBranco();
+        });
+
+        initClassGrid();
+    </script>
+</body>
+</html>
