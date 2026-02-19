@@ -57,9 +57,9 @@
             background: white;
             width: 250px;
             height: 310px;
-            position: fixed;
-            top: 135px;
-            right: 665px;
+            position: relative;
+            top: 35px;
+            right: 386px;
         }
 
         .pulse-cursor {
@@ -78,9 +78,9 @@
             border-radius: 4px;
             font-size: 15px;
             font-weight: bold;
-            position: fixed;
-            top: 502px;
-            right: 665px;
+            position: absolute;
+            top: 420px;
+            right: 409px;
         }
     </style>
 </head>
@@ -221,65 +221,65 @@
         
         const CANDIDATES = [
             //Turma 101
-            { number: '10', name: 'LORA', party: '101', photo: 'https://picsum.photos/seed/10/200/250' },
-            { number: '11', name: 'LIVIA', party: '101', photo: 'https://picsum.photos/seed/10/200/250' },
-            { number: '12', name: 'LUIS', party: '101', photo: 'https://picsum.photos/seed/10/200/250' },
+            { number: '10', name: 'LARA', party: '101', photo: 'https://picsum.photos/seed/10/200/250' },
+            { number: '11', name: 'GABRIEL', party: '101', photo: 'https://picsum.photos/seed/10/200/250' },
+            { number: '12', name: 'DANIEL', party: '101', photo: 'https://picsum.photos/seed/10/200/250' },
             { number: '13', name: 'LUIS', party: '101', photo: 'https://picsum.photos/seed/10/200/250' },
             // Turma 102
-            { number: '14', name: 'MATHEUS SILVA', party: '102', photo: 'https://picsum.photos/seed/10/200/250' },
-            { number: '15', name: 'EDUARDO', party: '102', photo: 'https://picsum.photos/seed/12/200/250' },
-            { number: '16', name: 'EDUARDO amorim', party: '102', photo: 'https://picsum.photos/seed/12/200/250' },
-            { number: '17', name: 'EDUARDO CORREAI', party: '102', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '14', name: 'ISABEL', party: '102', photo: 'https://picsum.photos/seed/10/200/250' },
+            { number: '15', name: 'MIGUEL', party: '102', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '16', name: 'LUCAS', party: '102', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '17', name: 'ISADORA', party: '102', photo: 'https://picsum.photos/seed/12/200/250' },
             // Turma 103
-            { number: '18', name: 'MATHEUS SILVA', party: '103', photo: 'https://picsum.photos/seed/10/200/250' },
-            { number: '19', name: 'EDUARDO', party: '103', photo: 'https://picsum.photos/seed/12/200/250' },
-            { number: '20', name: 'EDUARDO amorim', party: '103', photo: 'https://picsum.photos/seed/12/200/250' },
-            { number: '21', name: 'EDUARDO CORREAI', party: '103', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '18', name: 'LUIZA', party: '103', photo: 'https://picsum.photos/seed/10/200/250' },
+            { number: '19', name: 'GUARDIATO', party: '103', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '20', name: 'LEANDRO', party: '103', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '21', name: 'JULIA', party: '103', photo: 'https://picsum.photos/seed/12/200/250' },
             // Turma 104
-            { number: '22', name: 'MATHEUS SILVA', party: '104', photo: 'https://picsum.photos/seed/10/200/250' },
-            { number: '23', name: 'EDUARDO', party: '104', photo: 'https://picsum.photos/seed/12/200/250' },
-            { number: '24', name: 'EDUARDO amorim', party: '104', photo: 'https://picsum.photos/seed/12/200/250' },
-            { number: '25', name: 'EDUARDO CORREAI', party: '104', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '22', name: 'JULIO', party: '104', photo: 'https://picsum.photos/seed/10/200/250' },
+            { number: '23', name: 'ANA', party: '104', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '24', name: 'RAIMUNDA', party: '104', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '25', name: 'ROSA', party: '104', photo: 'https://picsum.photos/seed/12/200/250' },
             // Turma 201
-            { number: '26', name: 'MATHEUS SILVA', party: '201', photo: 'https://picsum.photos/seed/10/200/250' },
-            { number: '27', name: 'EDUARDO', party: '201', photo: 'https://picsum.photos/seed/12/200/250' },
-            { number: '28', name: 'EDUARDO amorim', party: '201', photo: 'https://picsum.photos/seed/12/200/250' },
-            { number: '29', name: 'EDUARDO CORREAI', party: '201', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '26', name: 'YURI', party: '201', photo: 'https://picsum.photos/seed/10/200/250' },
+            { number: '27', name: 'ELOANNY', party: '201', photo: './ELOANNY.jpeg' },
+            { number: '28', name: '002', party: '201', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '29', name: '003', party: '201', photo: 'https://picsum.photos/seed/12/200/250' },
             // Turma 202
-            { number: '30', name: 'MATHEUS SILVA', party: '202', photo: 'https://picsum.photos/seed/10/200/250' },
-            { number: '31', name: 'EDUARDO', party: '202', photo: 'https://picsum.photos/seed/12/200/250' },
-            { number: '32', name: 'EDUARDO amorim', party: '202', photo: 'https://picsum.photos/seed/12/200/250' },
-            { number: '33', name: 'EDUARDO CORREAI', party: '202', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '30', name: 'PEDRO JUAN', party: '202', photo: './ruan.jpeg' },
+            { number: '31', name: 'MIRIAN', party: '202', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '32', name: 'LUCAS PIETRO', party: '202', photo: './PIETRO.jpeg' },
+            { number: '33', name: '007', party: '202', photo: 'https://picsum.photos/seed/12/200/250' },
             // Turma 203
-            { number: '34', name: 'MATHEUS SILVA', party: '203', photo: 'https://picsum.photos/seed/10/200/250' },
-            { number: '35', name: 'EDUARDO', party: '203', photo: 'https://picsum.photos/seed/12/200/250' },
-            { number: '36', name: 'EDUARDO amorim', party: '203', photo: 'https://picsum.photos/seed/12/200/250' },
-            { number: '37', name: 'EDUARDO CORREAI', party: '203', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '34', name: 'VICTOR YAN', party: '203', photo: 'https://picsum.photos/seed/10/200/250' },
+            { number: '35', name: '008', party: '203', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '36', name: '009', party: '203', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '37', name: '010', party: '203', photo: 'https://picsum.photos/seed/12/200/250' },
             // Turma 204
-            { number: '38', name: 'MATHEUS SILVA', party: '204', photo: 'https://picsum.photos/seed/10/200/250' },
-            { number: '39', name: 'EDUARDO', party: '204', photo: 'https://picsum.photos/seed/12/200/250' },
-            { number: '40', name: 'EDUARDO amorim', party: '204', photo: 'https://picsum.photos/seed/12/200/250' },
-            { number: '41', name: 'EDUARDO CORREAI', party: '204', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '38', name: 'GLEICIANE', party: '204', photo: './GLEISE.jpeg' },
+            { number: '39', name: 'ARYELEY CHULÉ', party: '204', photo: './ary.jpeg' },
+            { number: '40', name: 'ELISEU', party: '204', photo: './ELISEU.jpeg' },
+            { number: '41', name: '011', party: '204', photo: 'https://picsum.photos/seed/12/200/250' },
             // Turma 301
-            { number: '42', name: 'MATHEUS SILVA', party: '301', photo: 'https://picsum.photos/seed/10/200/250' },
-            { number: '43', name: 'EDUARDO', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
-            { number: '44', name: 'EDUARDO amorim', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
-            { number: '45', name: 'EDUARDO CORREAI', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '42', name: 'MATHEUS SILVA', party: '301', photo: './MATHEUS.jpg' },
+            { number: '43', name: 'EDUARDO FELIX', party: '301', photo: './cadu.jpg' },
+            { number: '44', name: 'JOVAN', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '45', name: 'RENATO', party: '301', photo: 'https://picsum.photos/seed/12/200/250' },
             // Turma 302
-            { number: '46', name: 'MATHEUS SILVA', party: '302', photo: 'https://picsum.photos/seed/10/200/250' },
-            { number: '47', name: 'EDUARDO', party: '302', photo: 'https://picsum.photos/seed/12/200/250' },
-            { number: '48', name: 'EDUARDO amorim', party: '302', photo: 'https://picsum.photos/seed/12/200/250' },
-            { number: '49', name: 'EDUARDO CORREAI', party: '302', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '46', name: 'LIVIA LOHANNY', party: '302', photo: './' },
+            { number: '47', name: 'ANDRECIELLY', party: '302', photo: './ANDRECIELLY.jpeg' },
+            { number: '48', name: 'STEPHANE', party: '302', photo: './ESTER.jpeg' },
+            { number: '49', name: '012', party: '302', photo: 'https://picsum.photos/seed/12/200/250' },
             // Turma 303
-            { number: '50', name: 'MATHEUS SILVA', party: '303', photo: 'https://picsum.photos/seed/10/200/250' },
-            { number: '51', name: 'EDUARDO', party: '303', photo: 'https://picsum.photos/seed/12/200/250' },
-            { number: '52', name: 'EDUARDO amorim', party: '303', photo: 'https://picsum.photos/seed/12/200/250' },
-            { number: '53', name: 'EDUARDO CORREAI', party: '303', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '50', name: 'JOÃO VITOR', party: '303', photo: 'https://picsum.photos/seed/10/200/250' },
+            { number: '51', name: 'PEDRO', party: '303', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '52', name: '013', party: '303', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '53', name: '014', party: '303', photo: 'https://picsum.photos/seed/12/200/250' },
             // Turma 304
-            { number: '54', name: 'MATHEUS SILVA', party: '304', photo: 'https://picsum.photos/seed/10/200/250' },
-            { number: '55', name: 'EDUARDO', party: '304', photo: 'https://picsum.photos/seed/12/200/250' },
-            { number: '56', name: 'EDUARDO amorim', party: '304', photo: 'https://picsum.photos/seed/12/200/250' },
-            { number: '57', name: 'EDUARDO CORREAI', party: '304', photo: 'https://picsum.photos/seed/12/200/250' },
+            { number: '54', name: 'ELOISE', party: '304', photo: 'https://picsum.photos/seed/10/200/250' },
+            { number: '55', name: 'JOÃO PEDRO', party: '304', photo: './koreano.jpeg' },
+            { number: '56', name: 'MARCELA', party: '304', photo: './marcela.jpeg' },
+            { number: '57', name: '015', party: '304', photo: 'https://picsum.photos/seed/12/200/250' },
             
         ];
 
@@ -327,7 +327,7 @@
             const gain = audioCtx.createGain();
             osc.type = 'sine';
             osc.frequency.setValueAtTime(2300, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.setValueAtTime(1.0, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.1);
             osc.connect(gain);
             gain.connect(audioCtx.destination);
@@ -357,7 +357,7 @@
 
             // --- NOVO CÓDIGO PARA O ÁUDIO DA URNA ---
             const urnaAudio = new Audio('./confirma-urna.mp3'); // Caminho para o seu arquivo de áudio
-            urnaAudio.volume = 0.7; // Ajuste o volume se necessário (0.0 a 1.0)
+            urnaAudio.volume = 1.0; // Ajuste o volume se necessário (0.0 a 1.0)
             urnaAudio.play();
 
             // Você pode adicionar um pequeno delay antes do "FIM" aparecer se o áudio for longo
@@ -588,8 +588,8 @@
         document.addEventListener('keydown', (e) => {
             if (e.key >= '0' && e.key <= '9') pressNumber(e.key);
             if (e.key === 'Enter') pressConfirma();
-            if (e.key === 'Backspace') pressCorrige();
-            if (e.key === ' ' || e.key === 'Shift') pressBranco();
+            if (e.key === 'Backspace' || e.key === 'Delete') pressCorrige();
+            if (e.code === "NumpadAdd") pressBranco();
         });
 
         initClassGrid();
