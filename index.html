@@ -588,7 +588,7 @@
         document.addEventListener('keydown', (e) => {
             if (e.key >= '0' && e.key <= '9') pressNumber(e.key);
             if (e.key === 'Enter') pressConfirma();
-            if (e.key === 'Backspace' || e.key === 'Delete') pressCorrige();
+            if (e.key === 'Delete' || e.code === 'NumpadSubtract') pressCorrige();
             if (e.code === "NumpadAdd") pressBranco();
         });
 
